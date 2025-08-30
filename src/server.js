@@ -1,3 +1,6 @@
+// Apply NeDB patch before any other requires
+require('./utils/nedb-patch');
+
 const app = require('./app');
 const config = require('./config');
 

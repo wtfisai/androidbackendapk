@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="/css/responsive-fixes.css">
+    <link rel="stylesheet" href="/css/tutorial.css">
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -331,16 +333,24 @@
         }
 
         .nav-tabs .nav-link {
-            color: #666;
+            color: #ffffff;
+            background: rgba(118, 75, 162, 0.7);
             border: none;
             padding: 0.75rem 1.5rem;
             font-weight: 500;
             transition: all 0.3s;
+            margin-right: 0.25rem;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(118, 75, 162, 0.9);
+            color: #ffffff;
         }
 
         .nav-tabs .nav-link.active {
-            color: #764ba2;
-            background: transparent;
+            color: #ffffff;
+            background: #764ba2;
             border-bottom: 3px solid #764ba2;
         }
 
@@ -369,9 +379,52 @@
             <a class="navbar-brand" href="#">
                 <i class="bi bi-bug-fill"></i> Android Debug Tools
             </a>
-            <div class="ms-auto">
+            <div class="ms-auto d-flex gap-2 align-items-center">
+                <!-- System Metrics Bar -->
+                <div id="metricsBar" class="d-flex align-items-center me-3 px-3 py-1 bg-light rounded">
+                    <!-- Network Signal -->
+                    <div class="me-3 d-flex align-items-center">
+                        <span id="networkSignal" class="me-1">
+                            <i class="bi bi-reception-0"></i>
+                        </span>
+                        <span id="wifiSignal">
+                            <i class="bi bi-wifi-off"></i>
+                        </span>
+                    </div>
+                    
+                    <!-- Uptime -->
+                    <div class="me-3">
+                        <i class="bi bi-clock-fill text-info"></i>
+                        <small id="uptimeMetric">--</small>
+                    </div>
+                    
+                    <!-- Battery -->
+                    <div class="me-3">
+                        <i class="bi bi-battery-half text-success"></i>
+                        <small id="batteryMetric">--%</small>
+                    </div>
+                    
+                    <!-- RAM Usage -->
+                    <div class="me-3">
+                        <i class="bi bi-memory text-warning"></i>
+                        <small id="ramMetric">--%</small>
+                    </div>
+                    
+                    <!-- Storage -->
+                    <div class="me-3">
+                        <i class="bi bi-hdd-fill text-primary"></i>
+                        <small id="storageMetric">--%</small>
+                    </div>
+                </div>
+                
                 <button class="btn btn-outline-primary me-2" onclick="window.location.href='/'">
                     <i class="bi bi-house"></i> Main Dashboard
+                </button>
+                <button class="btn btn-outline-primary me-2" onclick="window.location.href='/remote.html'">
+                    <i class="bi bi-phone-vibrate"></i> Remote
+                </button>
+                <button class="btn btn-outline-info me-2" onclick="tutorial.toggleHelpMode()" title="Interactive Help">
+                    <i class="bi bi-question-circle"></i>
                 </button>
                 <button class="btn btn-outline-success" onclick="showExportModal()">
                     <i class="bi bi-download"></i> Export All
@@ -1412,5 +1465,8 @@
             URL.revokeObjectURL(url);
         }
     </script>
+    <script src="/js/mobile-menu.js"></script>
+    <script src="/js/metrics-bar.js"></script>
+    <script src="/js/tutorial.js"></script>
 </body>
 </html>

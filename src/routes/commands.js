@@ -127,4 +127,36 @@ router.get(
   })
 );
 
+// Root status check endpoint
+router.get(
+  '/root-status',
+  authenticate,
+  asyncHandler(async (req, res) => {
+    try {
+      // Try to execute a safe command with su to check root access
+      const { stdout, stderr } = await execAsync('timeout 2 su -c "id" 2>&1 || echo "not_rooted"', {
+        timeout: 3000,
+        maxBuffer: 1024
+      });
+
+      const output = stdout.toString();
+      const isRooted = output.includes('uid=0') || output.includes('root');
+
+      res.json({
+        rooted: isRooted,
+        output: output.trim(),
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      // If su command fails or times out, device is not rooted
+      res.json({
+        rooted: false,
+        output: 'not_rooted',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  })
+);
+
 module.exports = router;

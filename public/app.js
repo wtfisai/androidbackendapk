@@ -28,6 +28,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadSystemInfo();
   loadBatteryInfo();
   loadNetworkInfo();
+  checkRootStatus(); // Check root status
+
+  // Initialize Bootstrap tooltips
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
 
   // Set up auto-refresh
   setInterval(() => {
@@ -103,6 +110,9 @@ async function updateStats() {
     const hours = Math.floor(system.uptime / 3600);
     const minutes = Math.floor((system.uptime % 3600) / 60);
     document.getElementById('uptime').textContent = `${hours}h ${minutes}m`;
+    
+    // Update metrics bar
+    updateMetricsBar(system, memUsed, hours, minutes);
   }
 
   const battery = await fetchAPI('/api/device/battery');
@@ -110,6 +120,119 @@ async function updateStats() {
     const level = battery.level || '?';
     const icon = battery.status === 'Charging' ? 'bi-battery-charging' : 'bi-battery-half';
     document.getElementById('batteryLevel').innerHTML = `<i class="bi ${icon}"></i> ${level}%`;
+    
+    // Update battery in metrics bar
+    const batteryMetric = document.getElementById('batteryMetric');
+    if (batteryMetric) {
+      batteryMetric.textContent = `${level}%`;
+      const batteryIcon = batteryMetric.previousElementSibling;
+      if (batteryIcon) {
+        batteryIcon.className = `bi ${icon} ${level < 20 ? 'text-danger' : level < 50 ? 'text-warning' : 'text-success'}`;
+      }
+    }
+  }
+  
+  // Update network signal strength
+  updateNetworkSignals();
+  
+  // Update storage usage
+  updateStorageMetric();
+}
+
+// Update metrics bar
+function updateMetricsBar(system, memUsed, hours, minutes) {
+  // Update uptime
+  const uptimeMetric = document.getElementById('uptimeMetric');
+  if (uptimeMetric) {
+    uptimeMetric.textContent = `${hours}h ${minutes}m`;
+  }
+  
+  // Update RAM usage
+  const ramMetric = document.getElementById('ramMetric');
+  if (ramMetric) {
+    ramMetric.textContent = `${memUsed}%`;
+    const ramIcon = ramMetric.previousElementSibling;
+    if (ramIcon) {
+      const memUsedNum = parseFloat(memUsed);
+      ramIcon.className = `bi bi-memory ${memUsedNum > 80 ? 'text-danger' : memUsedNum > 60 ? 'text-warning' : 'text-success'}`;
+    }
+  }
+}
+
+// Update network signal indicators
+async function updateNetworkSignals() {
+  try {
+    // Get network info
+    const result = await fetchAPI('/api/shell', {
+      method: 'POST',
+      body: JSON.stringify({ command: 'dumpsys telephony.registry | grep "mSignalStrength" | head -1' })
+    });
+    
+    if (result && result.output) {
+      // Parse signal strength from dumpsys
+      const signalMatch = result.output.match(/mSignalStrength=SignalStrength.*?gsm:\s*(\d+)/);
+      const gsmSignal = signalMatch ? parseInt(signalMatch[1]) : 0;
+      
+      // Convert GSM signal to bars (0-31 scale to 0-4 bars)
+      let mobileBars = 0;
+      if (gsmSignal > 0) {
+        if (gsmSignal >= 12) mobileBars = 4;
+        else if (gsmSignal >= 8) mobileBars = 3;
+        else if (gsmSignal >= 5) mobileBars = 2;
+        else mobileBars = 1;
+      }
+      
+      const networkSignal = document.getElementById('networkSignal');
+      if (networkSignal) {
+        networkSignal.innerHTML = `<i class="bi bi-reception-${mobileBars}"></i>`;
+      }
+    }
+    
+    // Get WiFi signal strength
+    const wifiResult = await fetchAPI('/api/shell', {
+      method: 'POST',
+      body: JSON.stringify({ command: 'dumpsys wifi | grep "mWifiInfo" | head -1' })
+    });
+    
+    if (wifiResult && wifiResult.output) {
+      const rssiMatch = wifiResult.output.match(/RSSI:\s*(-?\d+)/);
+      const rssi = rssiMatch ? parseInt(rssiMatch[1]) : -100;
+      
+      // Convert RSSI to bars
+      let wifiBars = 'off';
+      if (rssi > -100) {
+        if (rssi >= -50) wifiBars = '2';
+        else if (rssi >= -70) wifiBars = '1';
+        else wifiBars = '';
+      }
+      
+      const wifiSignal = document.getElementById('wifiSignal');
+      if (wifiSignal) {
+        wifiSignal.innerHTML = `<i class="bi bi-wifi${wifiBars === 'off' ? '-off' : wifiBars === '' ? '' : `-${wifiBars}`}"></i>`;
+      }
+    }
+  } catch (error) {
+    console.error('Error updating network signals:', error);
+  }
+}
+
+// Update storage metric
+async function updateStorageMetric() {
+  const storage = await fetchAPI('/api/storage');
+  if (storage && storage.storage && storage.storage.length > 0) {
+    // Find main storage (usually /data or /storage/emulated)
+    const mainStorage = storage.storage.find(s => s.mounted === '/data' || s.mounted === '/storage/emulated/0') || storage.storage[0];
+    if (mainStorage) {
+      const storageMetric = document.getElementById('storageMetric');
+      if (storageMetric) {
+        const usedPercent = parseInt(mainStorage.usePercent);
+        storageMetric.textContent = mainStorage.usePercent;
+        const storageIcon = storageMetric.previousElementSibling;
+        if (storageIcon) {
+          storageIcon.className = `bi bi-hdd-fill ${usedPercent > 90 ? 'text-danger' : usedPercent > 70 ? 'text-warning' : 'text-primary'}`;
+        }
+      }
+    }
   }
 }
 
@@ -367,6 +490,53 @@ function formatBytes(bytes) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Check root status
+async function checkRootStatus() {
+  try {
+    // Check for root using dedicated endpoint
+    const result = await fetchAPI('/api/root-status');
+    
+    const rootStatusElement = document.getElementById('rootStatus');
+    const rootIconElement = document.getElementById('rootIcon');
+    const tooltipInstance = bootstrap.Tooltip.getInstance(rootStatusElement);
+    
+    if (result && result.rooted) {
+      // Device is rooted
+      rootStatusElement.classList.remove('bg-secondary');
+      rootStatusElement.classList.add('bg-success');
+      rootIconElement.classList.remove('bi-lock-fill');
+      rootIconElement.classList.add('bi-unlock-fill');
+      
+      // Update tooltip
+      if (tooltipInstance) {
+        tooltipInstance.setContent({ '.tooltip-inner': 'Device is ROOTED - Full system access available' });
+      }
+    } else {
+      // Device is not rooted
+      rootStatusElement.classList.remove('bg-secondary');
+      rootStatusElement.classList.add('bg-warning');
+      rootIconElement.classList.remove('bi-unlock-fill');
+      rootIconElement.classList.add('bi-lock-fill');
+      
+      // Update tooltip
+      if (tooltipInstance) {
+        tooltipInstance.setContent({ '.tooltip-inner': 'Device is NOT ROOTED - Limited system access' });
+      }
+    }
+  } catch (error) {
+    // Error checking root status
+    const rootStatusElement = document.getElementById('rootStatus');
+    const tooltipInstance = bootstrap.Tooltip.getInstance(rootStatusElement);
+    
+    rootStatusElement.classList.remove('bg-secondary');
+    rootStatusElement.classList.add('bg-danger');
+    
+    if (tooltipInstance) {
+      tooltipInstance.setContent({ '.tooltip-inner': 'Unable to determine root status' });
+    }
+  }
 }
 
 // Initial stats update

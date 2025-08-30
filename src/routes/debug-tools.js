@@ -1298,6 +1298,50 @@ router.post('/export/packets', authenticateApiKey, async (req, res) => {
   }
 });
 
+// UI Automator dump endpoint
+router.post('/uiautomator/dump', authenticateApiKey, async (req, res) => {
+  try {
+    const { sessionId } = req.body;
+    const timestamp = Date.now();
+    const filepath = `/sdcard/window_dump_${timestamp}.xml`;
+
+    // Run uiautomator dump command
+    const result = await executeAndLog(`uiautomator dump ${filepath}`, sessionId);
+
+    // Try to read the dumped file
+    let uiHierarchy = '';
+    try {
+      const readResult = await executeAndLog(`cat ${filepath}`, sessionId);
+      uiHierarchy = readResult.stdout;
+    } catch (e) {
+      // File might not be accessible
+      console.error('Could not read UI dump file:', e.message);
+    }
+
+    await Activity.log({
+      type: 'debug_tools',
+      action: 'ui_dump',
+      metadata: { filepath, sessionId }
+    });
+
+    res.json({
+      success: result.exitCode === 0,
+      filepath,
+      uiHierarchy: uiHierarchy.substring(0, 2000), // Send first 2000 chars
+      timestamp: new Date().toISOString(),
+      output: result.stdout
+    });
+
+  } catch (error) {
+    console.error('UI dump error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to dump UI',
+      message: error.message
+    });
+  }
+});
+
 // Clean up old processes periodically
 setInterval(() => {
   const now = Date.now();

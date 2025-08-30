@@ -1,0 +1,230 @@
+/* Responsive Fixes for Mobile and Desktop Accessibility */
+
+/* Mobile Navigation Fixes */
+@media (max-width: 768px) {
+    /* Navbar improvements for mobile */
+    .navbar {
+        padding: 0.5rem !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem !important;
+    }
+    
+    .navbar .d-flex {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+    
+    .navbar .btn-outline-primary {
+        font-size: 0.75rem !important;
+        padding: 0.25rem 0.5rem !important;
+        margin: 0.25rem 0.25rem !important;
+    }
+    
+    .navbar .btn-outline-primary i {
+        display: none; /* Hide icons on mobile to save space */
+    }
+    
+    /* Tab navigation for mobile */
+    .nav-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .nav-tabs .nav-link {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.875rem !important;
+        white-space: nowrap;
+    }
+    
+    /* Cards and stat cards */
+    .stat-card {
+        padding: 15px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .card {
+        margin-bottom: 15px !important;
+    }
+    
+    .card-header {
+        padding: 0.75rem !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Tables */
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    /* File explorer specific */
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+    
+    .toolbar-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-toolbar {
+        font-size: 0.75rem !important;
+        padding: 0.375rem 0.75rem !important;
+        margin: 0.25rem !important;
+    }
+    
+    .search-box {
+        width: 100% !important;
+        margin-top: 0.5rem;
+    }
+    
+    /* Apps manager specific */
+    .filter-row {
+        flex-direction: column;
+    }
+    
+    .filter-group {
+        width: 100%;
+        margin-bottom: 0.75rem;
+    }
+    
+    .toggle-group, .time-range-selector {
+        width: 100%;
+        justify-content: space-around;
+    }
+    
+    .app-item {
+        padding: 0.75rem !important;
+    }
+    
+    .app-info {
+        font-size: 0.875rem;
+    }
+    
+    .app-stats {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+    
+    /* Debug tools specific */
+    .tool-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .tool-card {
+        padding: 0.75rem !important;
+    }
+    
+    /* Modals */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    /* Console output */
+    .output-console {
+        min-height: 200px !important;
+        max-height: 300px !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .navbar-brand span {
+        display: none; /* Hide text, show only icon */
+    }
+    
+    .stat-value {
+        font-size: 1.2em !important;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Stack stat cards in single column */
+    .col-6 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+    /* Increase touch targets */
+    button, .btn, a.btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .file-checkbox, .app-checkbox {
+        width: 24px !important;
+        height: 24px !important;
+    }
+    
+    .nav-link {
+        padding: 0.75rem 1rem !important;
+    }
+    
+    /* Better spacing for touch */
+    .file-item, .app-item {
+        min-height: 60px;
+        margin-bottom: 0.5rem !important;
+    }
+}
+
+/* Desktop improvements */
+@media (min-width: 1200px) {
+    .main-container {
+        max-width: 1400px !important;
+    }
+    
+    .tool-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important;
+    }
+}
+
+/* Accessibility improvements */
+.btn:focus, .nav-link:focus, button:focus {
+    outline: 2px solid #764ba2 !important;
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .card, .tool-card, .app-item, .file-item {
+        border: 2px solid currentColor !important;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1a1a1a !important;
+    }
+    
+    .card, .tool-card, .navbar {
+        background: #2c2c2c !important;
+        color: #f0f0f0 !important;
+    }
+    
+    .btn-outline-primary {
+        color: #9ca3ff !important;
+        border-color: #9ca3ff !important;
+    }
+}
