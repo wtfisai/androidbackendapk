@@ -1,0 +1,12 @@
+Git Bash Commands to Run:
+
+1. Open Git Bash in the project directory
+2. Run these commands one by one:
+
+cd /e/windsurfer/androidbackend/androidbackendapk
+git add .
+git commit -m "feat: add APK conversion plan and update git remote to androidbackendapk"
+git push -u origin main
+
+Alternative: Run the shell script:
+./git-bash-sync.sh
