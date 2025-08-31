@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Android Diagnostic Agent</string>
+    <string name="app_description">Remote device monitoring and management</string>
+    
+    <!-- Main Activity -->
+    <string name="welcome_message">Welcome to Android Diagnostic Platform</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="logout">Logout</string>
+    <string name="start_service">Start Monitoring</string>
+    <string name="stop_service">Stop Monitoring</string>
+    <string name="request_permissions">Request Permissions</string>
+    <string name="settings">Settings</string>
+    
+    <!-- Service Status -->
+    <string name="service_running">Service Running</string>
+    <string name="service_stopped">Service Stopped</string>
+    <string name="monitoring_active">Device Monitoring Active</string>
+    
+    <!-- Permissions -->
+    <string name="permissions_granted">All permissions granted</string>
+    <string name="permissions_missing">Some permissions are missing</string>
+    <string name="permission_rationale">This app requires various permissions to monitor device metrics and execute commands</string>
+    
+    <!-- Notifications -->
+    <string name="notification_title">Device Monitoring</string>
+    <string name="notification_text">Monitoring device metrics...</string>
+    <string name="alert_high_cpu">High CPU Usage</string>
+    <string name="alert_low_memory">Low Memory</string>
+    <string name="alert_low_battery">Low Battery</string>
+    <string name="alert_low_storage">Low Storage</string>
+    
+    <!-- Errors -->
+    <string name="error_connection">Connection error</string>
+    <string name="error_authentication">Authentication failed</string>
+    <string name="error_permission_denied">Permission denied</string>
+    <string name="error_command_failed">Command execution failed</string>
+</resources>
