@@ -23,10 +23,13 @@ function parsePackageList(output, showSystem = false) {
       // Filter system apps if needed
       if (!showSystem) {
         // Skip system apps (basic heuristic)
-        if (packageName.startsWith('com.android.') ||
-                    packageName.startsWith('android.') ||
-                    packageName.startsWith('com.google.android.') &&
-                    !packageName.includes('gms') && !packageName.includes('play')) {
+        if (
+          packageName.startsWith('com.android.') ||
+          packageName.startsWith('android.') ||
+          (packageName.startsWith('com.google.android.') &&
+            !packageName.includes('gms') &&
+            !packageName.includes('play'))
+        ) {
           continue;
         }
       }
@@ -184,7 +187,6 @@ router.get('/list', async (req, res) => {
       order,
       timeRange
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to list applications',
@@ -213,8 +215,8 @@ router.get('/info/:packageName', async (req, res) => {
     );
     const permissions = permOutput
       .split('\n')
-      .filter(line => line.includes('android.permission'))
-      .map(line => line.trim());
+      .filter((line) => line.includes('android.permission'))
+      .map((line) => line.trim());
 
     // Get activities
     const { stdout: activityOutput } = await execAsync(
@@ -227,7 +229,6 @@ router.get('/info/:packageName', async (req, res) => {
       permissions,
       activities: activityOutput.trim()
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to get app info',
@@ -250,7 +251,9 @@ router.post('/uninstall', async (req, res) => {
     for (const packageName of packages) {
       try {
         // Check if it's a system app
-        const { stdout: checkOutput } = await execAsync(`pm list packages -s | grep ${packageName}`);
+        const { stdout: checkOutput } = await execAsync(
+          `pm list packages -s | grep ${packageName}`
+        );
         const isSystemApp = checkOutput.includes(packageName);
 
         if (isSystemApp) {
@@ -282,10 +285,9 @@ router.post('/uninstall', async (req, res) => {
     res.json({
       results,
       totalRequested: packages.length,
-      succeeded: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length
+      succeeded: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to uninstall apps',
@@ -327,10 +329,9 @@ router.post('/sleep', async (req, res) => {
     res.json({
       results,
       totalRequested: packages.length,
-      succeeded: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length
+      succeeded: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to sleep apps',
@@ -372,10 +373,9 @@ router.post('/clear-cache', async (req, res) => {
     res.json({
       results,
       totalRequested: packages.length,
-      succeeded: results.filter(r => r.success).length,
-      failed: results.filter(r => !r.success).length
+      succeeded: results.filter((r) => r.success).length,
+      failed: results.filter((r) => !r.success).length
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to clear cache',
@@ -391,9 +391,7 @@ router.get('/stats/:packageName', async (req, res) => {
     const { timeRange = '1d' } = req.query; // 1d, 1w, 1m, 1y
 
     // Get usage stats
-    const { stdout: usageOutput } = await execAsync(
-      `dumpsys usagestats ${packageName} | head -50`
-    );
+    const { stdout: usageOutput } = await execAsync(`dumpsys usagestats ${packageName} | head -50`);
 
     // Get battery stats
     const { stdout: batteryOutput } = await execAsync(
@@ -416,7 +414,6 @@ router.get('/stats/:packageName', async (req, res) => {
     };
 
     res.json(stats);
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to get app statistics',
@@ -440,9 +437,7 @@ router.post('/launch/:packageName', async (req, res) => {
     }
 
     // Launch the app
-    const { stdout: launchOutput } = await execAsync(
-      `am start -n ${activityOutput.trim()}`
-    );
+    const { stdout: launchOutput } = await execAsync(`am start -n ${activityOutput.trim()}`);
 
     res.json({
       packageName,
@@ -450,7 +445,6 @@ router.post('/launch/:packageName', async (req, res) => {
       launched: launchOutput.includes('Starting'),
       output: launchOutput.trim()
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to launch app',

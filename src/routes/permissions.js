@@ -71,10 +71,10 @@ const SPECIAL_PERMISSIONS = {
 router.get('/status', authenticateApiKey, async (req, res) => {
   try {
     const permissions = {};
-    
+
     // Get permission status from database and system
     const dbStatuses = await PermissionStatus.getAllStatuses();
-    
+
     // Check system permissions
     let systemPermissions = {};
     try {
@@ -84,11 +84,11 @@ router.get('/status', authenticateApiKey, async (req, res) => {
       // Fallback if dumpsys fails
       systemPermissions = '';
     }
-    
+
     for (const [key, perm] of Object.entries(SPECIAL_PERMISSIONS)) {
       const dbStatus = dbStatuses[perm.name];
       const systemGranted = systemPermissions.includes(perm.name);
-      
+
       permissions[key] = {
         ...perm,
         granted: systemGranted || (dbStatus && dbStatus.granted),
@@ -98,7 +98,7 @@ router.get('/status', authenticateApiKey, async (req, res) => {
         timestamp: dbStatus ? dbStatus.timestamp : null
       };
     }
-    
+
     // Check if we have root or ADB access
     let accessLevel = 'normal';
     try {
@@ -109,7 +109,7 @@ router.get('/status', authenticateApiKey, async (req, res) => {
     } catch (e) {
       // Not root
     }
-    
+
     // Check if we can use pm grant (requires root or ADB)
     let canGrant = false;
     try {
@@ -118,13 +118,13 @@ router.get('/status', authenticateApiKey, async (req, res) => {
     } catch (e) {
       canGrant = false;
     }
-    
+
     await Activity.log({
       type: 'permissions',
       action: 'check_status',
       metadata: { accessLevel, canGrant }
     });
-    
+
     res.json({
       permissions,
       accessLevel,
@@ -141,24 +141,25 @@ router.get('/status', authenticateApiKey, async (req, res) => {
 router.post('/grant', authenticateApiKey, async (req, res) => {
   try {
     const { permissionKey, confirmed } = req.body;
-    
+
     if (!confirmed) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'User confirmation required',
-        warning: 'Granting special permissions can affect system security. Please confirm your action.'
+        warning:
+          'Granting special permissions can affect system security. Please confirm your action.'
       });
     }
-    
+
     const permission = SPECIAL_PERMISSIONS[permissionKey];
     if (!permission) {
       return res.status(400).json({ error: 'Invalid permission key' });
     }
-    
+
     // Try different methods to grant permission
     let granted = false;
     let method = 'none';
     let output = '';
-    
+
     // Method 1: Direct pm grant
     try {
       const { stdout, stderr } = await execAsync(permission.command);
@@ -170,7 +171,7 @@ router.post('/grant', authenticateApiKey, async (req, res) => {
     } catch (e) {
       // Try next method
     }
-    
+
     // Method 2: Try with su if available
     if (!granted) {
       try {
@@ -184,7 +185,7 @@ router.post('/grant', authenticateApiKey, async (req, res) => {
         // Try next method
       }
     }
-    
+
     // Method 3: Try appops for some permissions
     if (!granted && permissionKey === 'PACKAGE_USAGE_STATS') {
       try {
@@ -196,24 +197,24 @@ router.post('/grant', authenticateApiKey, async (req, res) => {
         // Failed
       }
     }
-    
+
     await Activity.log({
       type: 'permissions',
       action: 'grant_permission',
-      metadata: { 
+      metadata: {
         permission: permission.name,
         granted,
         method
       }
     });
-    
+
     if (granted) {
       // Save to database
-      await PermissionStatus.grant(permission.name, method, { 
+      await PermissionStatus.grant(permission.name, method, {
         output,
-        userConfirmed: true 
+        userConfirmed: true
       });
-      
+
       res.json({
         success: true,
         permission: permission.name,
@@ -241,24 +242,24 @@ router.post('/grant', authenticateApiKey, async (req, res) => {
 router.post('/revoke', authenticateApiKey, async (req, res) => {
   try {
     const { permissionKey, confirmed } = req.body;
-    
+
     if (!confirmed) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'User confirmation required',
         warning: 'Revoking permissions may disable some features. Please confirm your action.'
       });
     }
-    
+
     const permission = SPECIAL_PERMISSIONS[permissionKey];
     if (!permission) {
       return res.status(400).json({ error: 'Invalid permission key' });
     }
-    
+
     const revokeCommand = permission.command.replace('grant', 'revoke');
-    
+
     let revoked = false;
     let method = 'none';
-    
+
     // Try to revoke
     try {
       await execAsync(revokeCommand);
@@ -273,17 +274,17 @@ router.post('/revoke', authenticateApiKey, async (req, res) => {
         // Failed
       }
     }
-    
+
     await Activity.log({
       type: 'permissions',
       action: 'revoke_permission',
-      metadata: { 
+      metadata: {
         permission: permission.name,
         revoked,
         method
       }
     });
-    
+
     res.json({
       success: revoked,
       permission: permission.name,
@@ -300,15 +301,16 @@ router.post('/revoke', authenticateApiKey, async (req, res) => {
 router.post('/enable-adb-network', authenticateApiKey, async (req, res) => {
   try {
     const { port = 5555, confirmed } = req.body;
-    
+
     if (!confirmed) {
       return res.status(400).json({
         error: 'User confirmation required',
-        warning: 'Enabling ADB over network can be a security risk. Only enable on trusted networks.',
+        warning:
+          'Enabling ADB over network can be a security risk. Only enable on trusted networks.',
         requirements: 'This operation requires root access'
       });
     }
-    
+
     // Check for root
     const { stdout: rootCheck } = await execAsync('su -c "id" 2>&1 || echo "not_root"');
     if (!rootCheck.includes('uid=0')) {
@@ -317,23 +319,25 @@ router.post('/enable-adb-network', authenticateApiKey, async (req, res) => {
         message: 'This operation requires a rooted device'
       });
     }
-    
+
     // Enable ADB over network
     await execAsync(`su -c "setprop service.adb.tcp.port ${port}"`);
     await execAsync('su -c "stop adbd"');
     await execAsync('su -c "start adbd"');
-    
+
     // Get device IP
-    const { stdout: ifconfig } = await execAsync('ifconfig wlan0 2>/dev/null || ip addr show wlan0');
+    const { stdout: ifconfig } = await execAsync(
+      'ifconfig wlan0 2>/dev/null || ip addr show wlan0'
+    );
     const ipMatch = ifconfig.match(/inet\s+(\d+\.\d+\.\d+\.\d+)/);
     const deviceIp = ipMatch ? ipMatch[1] : 'unknown';
-    
+
     await Activity.log({
       type: 'permissions',
       action: 'enable_adb_network',
       metadata: { port, deviceIp }
     });
-    
+
     res.json({
       success: true,
       message: 'ADB over network enabled',
@@ -371,10 +375,7 @@ router.get('/instructions', authenticateApiKey, async (req, res) => {
       },
       root: {
         description: 'Using root access (if available)',
-        requirements: [
-          'Rooted Android device',
-          'Root management app (Magisk, SuperSU, etc.)'
-        ],
+        requirements: ['Rooted Android device', 'Root management app (Magisk, SuperSU, etc.)'],
         steps: [
           '1. Ensure device is rooted',
           '2. Grant root access to Termux when prompted',
@@ -383,10 +384,7 @@ router.get('/instructions', authenticateApiKey, async (req, res) => {
       },
       shizuku: {
         description: 'Using Shizuku (non-root alternative)',
-        requirements: [
-          'Shizuku app installed',
-          'Shizuku service running'
-        ],
+        requirements: ['Shizuku app installed', 'Shizuku service running'],
         steps: [
           '1. Install Shizuku from Play Store',
           '2. Start Shizuku service via ADB or root',

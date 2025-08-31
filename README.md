@@ -10,6 +10,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 ## 🌟 Features
 
 ### Core Capabilities
+
 - **System Monitoring** - Real-time CPU, memory, disk, and process monitoring
 - **Device Management** - Battery status, network interfaces, device properties
 - **Package Management** - List, install, uninstall Android packages
@@ -20,6 +21,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 ### 36 Integrated Android Debug Tools
 
 #### 🔍 Debugging & Logs
+
 1. **Logcat** - Real-time Android system logs with advanced filtering
 2. **Bug Report Generator** - Comprehensive system diagnostic reports
 3. **Layout Inspector** - UI hierarchy and view tree analysis
@@ -27,6 +29,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 5. **Network Inspector** - HTTP/WebSocket traffic monitoring
 
 #### 📊 Performance Profiling
+
 6. **CPU Profiler** - CPU usage sampling and tracing
 7. **Memory Profiler** - Memory allocations and heap analysis
 8. **Power Profiler** - Battery usage and power consumption
@@ -34,6 +37,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 10. **Battery Stats** - Detailed battery consumption analytics
 
 #### 🔧 System Tools
+
 11. **Dumpsys Services** - Inspect 30+ system services
 12. **Settings Manager** - Read/write system settings
 13. **Developer Options** - Toggle developer settings
@@ -41,6 +45,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 15. **Screen Recording** - Capture screen activity
 
 #### 📱 Device Management
+
 16. **ADB Device Discovery** - List and manage connected devices
 17. **Wireless Debugging** - Connect via Wi-Fi
 18. **App Installation** - Install/uninstall APKs
@@ -48,6 +53,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 20. **Intent Broadcasting** - Send system intents
 
 #### 🧪 Testing Frameworks
+
 21. **UI Automator** - Cross-app UI automation
 22. **Monkey Testing** - Random UI stress testing
 23. **Instrumented Tests** - Run JUnit tests on device
@@ -55,6 +61,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 25. **Screenshot Capture** - Take device screenshots
 
 #### 🌐 Network Analysis
+
 26. **Network Connections** - Active connection monitoring
 27. **Packet Capture** - tcpdump integration
 28. **Port Scanning** - Network service discovery
@@ -62,6 +69,7 @@ A comprehensive REST API server for remotely monitoring, debugging, and managing
 30. **WiFi Scanner** - Available networks detection
 
 #### 📈 Advanced Diagnostics
+
 31. **Process Optimization** - Sleep/wake/kill processes
 32. **Memory Cleanup** - Free system memory
 33. **Trace Logging** - Application trace collection

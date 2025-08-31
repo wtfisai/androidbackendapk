@@ -1331,7 +1331,6 @@ router.post('/uiautomator/dump', authenticateApiKey, async (req, res) => {
       timestamp: new Date().toISOString(),
       output: result.stdout
     });
-
   } catch (error) {
     console.error('UI dump error:', error);
     res.status(500).json({

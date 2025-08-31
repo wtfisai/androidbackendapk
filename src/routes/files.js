@@ -82,7 +82,7 @@ router.get('/list', async (req, res) => {
 
     // Filter hidden files if needed
     if (!showHidden) {
-      files = files.filter(file => !file.startsWith('.'));
+      files = files.filter((file) => !file.startsWith('.'));
     }
 
     // Get detailed info for each file
@@ -98,7 +98,7 @@ router.get('/list', async (req, res) => {
     );
 
     // Filter out null entries and sort
-    const validFiles = fileDetails.filter(f => f !== null);
+    const validFiles = fileDetails.filter((f) => f !== null);
     validFiles.sort((a, b) => {
       // Directories first, then alphabetical
       if (a.isDirectory && !b.isDirectory) {
@@ -170,7 +170,6 @@ router.get('/download', async (req, res) => {
     // Stream the file
     const fileStream = require('fs').createReadStream(filePath);
     fileStream.pipe(res);
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to download file',
@@ -186,7 +185,7 @@ router.post('/upload', upload.array('files', 10), async (req, res) => {
       return res.status(400).json({ error: 'No files provided' });
     }
 
-    const uploadedFiles = req.files.map(file => ({
+    const uploadedFiles = req.files.map((file) => ({
       originalName: file.originalname,
       filename: file.filename,
       path: file.path,
@@ -200,7 +199,6 @@ router.post('/upload', upload.array('files', 10), async (req, res) => {
       files: uploadedFiles,
       count: uploadedFiles.length
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to upload files',
@@ -247,7 +245,6 @@ router.delete('/delete', async (req, res) => {
       message: 'File/directory deleted successfully',
       path: filePath
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to delete file/directory',
@@ -271,7 +268,6 @@ router.post('/mkdir', async (req, res) => {
       message: 'Directory created successfully',
       path: dirPath
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to create directory',
@@ -298,7 +294,6 @@ router.post('/move', async (req, res) => {
       from: sourcePath,
       to: destinationPath
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to move file/directory',
@@ -333,7 +328,6 @@ router.post('/copy', async (req, res) => {
       from: sourcePath,
       to: destinationPath
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to copy file/directory',
@@ -381,7 +375,6 @@ router.get('/info', async (req, res) => {
     }
 
     res.json(stats);
-
   } catch (error) {
     res.status(500).json({
       error: 'Failed to get file info',
@@ -404,7 +397,10 @@ router.get('/search', async (req, res) => {
       `find "${searchPath}" -type f -iname "*${query}*" 2>/dev/null | head -${maxResults}`
     );
 
-    const files = stdout.trim().split('\n').filter(f => f);
+    const files = stdout
+      .trim()
+      .split('\n')
+      .filter((f) => f);
 
     // Get file details
     const fileDetails = await Promise.all(
@@ -420,10 +416,9 @@ router.get('/search', async (req, res) => {
     res.json({
       query,
       searchPath,
-      results: fileDetails.filter(f => f !== null),
-      count: fileDetails.filter(f => f !== null).length
+      results: fileDetails.filter((f) => f !== null),
+      count: fileDetails.filter((f) => f !== null).length
     });
-
   } catch (error) {
     res.status(500).json({
       error: 'Search failed',

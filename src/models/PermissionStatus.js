@@ -26,9 +26,9 @@ class PermissionStatus {
     return new Promise((resolve, reject) => {
       // Update if exists, insert if not
       permissions.update(
-        { permissionName }, 
-        permissionRecord, 
-        { upsert: true }, 
+        { permissionName },
+        permissionRecord,
+        { upsert: true },
         (err, numReplaced) => {
           if (err) {
             reject(err);
@@ -79,7 +79,7 @@ class PermissionStatus {
           reject(err);
         } else {
           const statusMap = {};
-          docs.forEach(doc => {
+          docs.forEach((doc) => {
             statusMap[doc.permissionName] = {
               granted: doc.granted,
               method: doc.method,
@@ -112,11 +112,11 @@ class PermissionStatus {
     return new Promise((resolve, reject) => {
       permissions.update(
         { permissionName },
-        { 
-          $set: { 
-            userConfirmed: confirmed, 
-            confirmationTimestamp: new Date() 
-          } 
+        {
+          $set: {
+            userConfirmed: confirmed,
+            confirmationTimestamp: new Date()
+          }
         },
         { upsert: true },
         (err, numUpdated) => {
@@ -152,17 +152,17 @@ class PermissionStatus {
         } else {
           const stats = {
             total: docs.length,
-            granted: docs.filter(d => d.granted).length,
-            revoked: docs.filter(d => !d.granted && d.revokedAt).length,
-            pending: docs.filter(d => d.userConfirmed && !d.granted).length,
+            granted: docs.filter((d) => d.granted).length,
+            revoked: docs.filter((d) => !d.granted && d.revokedAt).length,
+            pending: docs.filter((d) => d.userConfirmed && !d.granted).length,
             byMethod: {},
             recent: docs
-              .filter(d => d.granted)
+              .filter((d) => d.granted)
               .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
               .slice(0, 5)
           };
 
-          docs.forEach(doc => {
+          docs.forEach((doc) => {
             if (doc.granted) {
               stats.byMethod[doc.method] = (stats.byMethod[doc.method] || 0) + 1;
             }
@@ -177,14 +177,14 @@ class PermissionStatus {
   // Clean up old revoked permissions
   static async cleanup(daysToKeep = 90) {
     const cutoffDate = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000);
-    
+
     return new Promise((resolve, reject) => {
       permissions.remove(
-        { 
-          granted: false, 
-          revokedAt: { $lt: cutoffDate } 
-        }, 
-        { multi: true }, 
+        {
+          granted: false,
+          revokedAt: { $lt: cutoffDate }
+        },
+        { multi: true },
         (err, numRemoved) => {
           if (err) {
             reject(err);

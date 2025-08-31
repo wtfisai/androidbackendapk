@@ -6,55 +6,80 @@
     <title>Android Remote Diagnostic Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/color-system.css">
     <link rel="stylesheet" href="/css/responsive-fixes.css">
     <link rel="stylesheet" href="/css/tutorial.css">
     <style>
-        :root {
-            --primary-color: #4CAF50;
-            --secondary-color: #2196F3;
-            --danger-color: #f44336;
-            --dark-bg: #1a1a1a;
-            --card-bg: #2c2c2c;
-        }
-
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)));
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .navbar {
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            background: var(--glass-bg) !important;
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            border-bottom: 1px solid hsl(var(--border));
+            box-shadow: var(--shadow);
+        }
+        
+        /* Dynamic header text color based on theme */
+        .navbar-brand {
+            color: #000000 !important;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+        }
+        
+        [data-theme="dark"] .navbar-brand {
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .navbar-brand:hover {
+            opacity: 0.9;
+        }
+        
+        .navbar-brand i {
+            color: inherit !important;
         }
 
         .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            background: white;
-            transition: transform 0.3s;
+            background: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--space-4);
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
         }
 
         .card:hover {
             transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
         }
 
         .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
+            background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)));
+            color: hsl(var(--primary-foreground));
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
             font-weight: 600;
+            border-bottom: 1px solid hsl(var(--border));
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)));
+            color: hsl(var(--primary-foreground));
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-4);
+            box-shadow: var(--shadow);
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
         }
 
         .stat-value {
@@ -68,23 +93,49 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)));
             border: none;
             border-radius: 25px;
             padding: 10px 25px;
-            transition: all 0.3s;
+            color: hsl(var(--primary-foreground));
+            transition: all var(--transition-normal);
         }
 
         .btn-primary:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px hsl(var(--primary) / 0.4);
+            color: hsl(var(--primary-foreground));
+        }
+
+        .btn-outline-primary {
+            color: hsl(var(--primary));
+            border-color: hsl(var(--primary));
+            transition: all var(--transition-normal);
+        }
+
+        .btn-outline-primary:hover {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            border-color: hsl(var(--primary));
+        }
+
+        .btn-outline-secondary {
+            color: hsl(var(--muted-foreground));
+            border-color: hsl(var(--border));
+            background: hsl(var(--card));
+        }
+
+        .btn-outline-secondary:hover {
+            background: hsl(var(--accent));
+            color: hsl(var(--accent-foreground));
         }
 
         .terminal {
-            background: #1e1e1e;
-            color: #0f0;
+            background: hsl(var(--card));
+            color: hsl(var(--success));
+            border: 1px solid hsl(var(--border));
             padding: 15px;
-            border-radius: 10px;
+            border-radius: var(--radius);
             font-family: 'Courier New', monospace;
             height: 400px;
             overflow-y: auto;
@@ -93,11 +144,17 @@
         }
 
         .command-input {
-            background: #2c2c2c;
-            color: white;
-            border: 1px solid #444;
-            border-radius: 5px;
+            background: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
             padding: 10px;
+        }
+
+        .command-input:focus {
+            border-color: hsl(var(--ring));
+            outline: 2px solid hsl(var(--ring) / 0.2);
+            outline-offset: 2px;
         }
 
         .process-list {
@@ -111,31 +168,33 @@
         }
 
         .nav-tabs {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 0.5rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            padding: var(--space-2);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-6);
+            border: 1px solid hsl(var(--border));
         }
 
         .nav-tabs .nav-link {
-            color: #333;
+            color: hsl(var(--muted-foreground));
             font-weight: 500;
             border: none;
             border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            transition: all var(--transition-normal);
+            border-radius: var(--radius-sm);
         }
 
         .nav-tabs .nav-link:hover {
-            color: #764ba2;
-            background: rgba(118, 75, 162, 0.1);
-            border-radius: 8px;
+            color: hsl(var(--foreground));
+            background: hsl(var(--accent));
         }
 
         .nav-tabs .nav-link.active {
-            color: white;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: hsl(var(--primary-foreground));
+            background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)));
             border-bottom: none;
-            border-radius: 8px;
         }
 
         .nav-tabs .nav-link i {
@@ -176,6 +235,71 @@
             padding: 5px 10px;
             border-radius: 15px;
         }
+
+        /* Form controls */
+        .form-control {
+            background: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            border: 1px solid hsl(var(--border));
+        }
+
+        .form-control:focus {
+            background: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 0.2rem hsl(var(--ring) / 0.2);
+        }
+
+        /* Table styling */
+        .table {
+            color: hsl(var(--card-foreground));
+        }
+
+        .table thead th {
+            background: hsl(var(--muted));
+            color: hsl(var(--muted-foreground));
+            border-color: hsl(var(--border));
+        }
+
+        .table td, .table th {
+            border-color: hsl(var(--border));
+        }
+
+        /* Badge styling */
+        .badge.bg-success {
+            background-color: hsl(var(--success)) !important;
+        }
+
+        .badge.bg-secondary {
+            background-color: hsl(var(--secondary)) !important;
+        }
+
+        .badge.bg-primary {
+            background-color: hsl(var(--primary)) !important;
+        }
+
+        /* Theme toggle button styling */
+        #theme-toggle {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all var(--transition-normal);
+        }
+
+        #theme-toggle:hover {
+            transform: rotate(180deg) scale(1.1);
+        }
+
+        /* Metrics bar theming */
+        #metricsBar {
+            background: var(--glass-bg) !important;
+            border: 1px solid hsl(var(--border));
+            color: hsl(var(--foreground)) !important;
+        }
     </style>
 </head>
 <body>
@@ -183,7 +307,7 @@
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
-                <i class="bi bi-phone-fill text-primary"></i> Android Diagnostic Dashboard
+                <i class="bi bi-phone-fill"></i> Android Diagnostic Dashboard
             </a>
             <div class="d-flex align-items-center">
                 <!-- System Metrics Bar (hidden on main dashboard) -->
@@ -235,8 +359,11 @@
                 <a href="/remote.html" class="btn btn-outline-primary me-2">
                     <i class="bi bi-phone-vibrate-fill"></i> Remote
                 </a>
-                <button class="btn btn-outline-info me-3" onclick="tutorial.showStartTutorialButton()" title="Interactive Help & Tutorial">
+                <button class="btn btn-outline-info me-2" onclick="tutorial.showStartTutorialButton()" title="Interactive Help & Tutorial">
                     <i class="bi bi-question-circle"></i>
+                </button>
+                <button id="theme-toggle" class="btn btn-outline-secondary me-3" onclick="window.themeManager?.toggleTheme()" title="Toggle theme">
+                    <i id="theme-toggle-icon" class="bi bi-circle-half"></i>
                 </button>
                 <span class="navbar-text d-flex align-items-center gap-2">
                     <span id="rootStatus" class="badge bg-secondary" 
@@ -562,6 +689,9 @@ Click "Load Logs" to fetch system logs...
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Theme Manager (load first) -->
+    <script src="/js/theme-manager.js"></script>
     
     <!-- Application JS -->
     <script src="app.js"></script>

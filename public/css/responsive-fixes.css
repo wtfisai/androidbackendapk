@@ -212,19 +212,26 @@
     }
 }
 
-/* Dark mode support */
+/* Dark mode support - now integrated with color system */
 @media (prefers-color-scheme: dark) {
-    body {
-        background: #1a1a1a !important;
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
     }
     
     .card, .tool-card, .navbar {
-        background: #2c2c2c !important;
-        color: #f0f0f0 !important;
+        background: hsl(var(--card)) !important;
+        color: hsl(var(--card-foreground)) !important;
+        border-color: hsl(var(--border)) !important;
     }
     
     .btn-outline-primary {
-        color: #9ca3ff !important;
-        border-color: #9ca3ff !important;
+        color: hsl(var(--primary)) !important;
+        border-color: hsl(var(--primary)) !important;
+    }
+    
+    .btn-outline-secondary {
+        color: hsl(var(--muted-foreground)) !important;
+        border-color: hsl(var(--border)) !important;
+        background: hsl(var(--card)) !important;
     }
 }

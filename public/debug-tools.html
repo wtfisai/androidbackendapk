@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="/css/color-system.css">
     <link rel="stylesheet" href="/css/responsive-fixes.css">
     <link rel="stylesheet" href="/css/tutorial.css">
     <style>
@@ -22,7 +23,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, hsl(var(--gradient-from)), hsl(var(--gradient-to)));
             min-height: 100vh;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
@@ -34,12 +35,25 @@
             padding: 1rem 0;
         }
 
+        /* Dynamic header text color based on theme */
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #000000 !important;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+        }
+        
+        [data-theme="dark"] .navbar-brand {
+            color: #ffffff !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .navbar-brand:hover {
+            opacity: 0.9;
+        }
+        
+        .navbar-brand i {
+            color: inherit !important;
         }
 
         .main-container {
@@ -425,6 +439,9 @@
                 </button>
                 <button class="btn btn-outline-info me-2" onclick="tutorial.toggleHelpMode()" title="Interactive Help">
                     <i class="bi bi-question-circle"></i>
+                </button>
+                <button id="theme-toggle" class="btn btn-outline-secondary me-2" onclick="window.themeManager?.toggleTheme()" title="Toggle theme">
+                    <i id="theme-toggle-icon" class="bi bi-circle-half"></i>
                 </button>
                 <button class="btn btn-outline-success" onclick="showExportModal()">
                     <i class="bi bi-download"></i> Export All
@@ -1465,6 +1482,9 @@
             URL.revokeObjectURL(url);
         }
     </script>
+    <!-- Theme Manager (load first) -->
+    <script src="/js/theme-manager.js"></script>
+    
     <script src="/js/mobile-menu.js"></script>
     <script src="/js/metrics-bar.js"></script>
     <script src="/js/tutorial.js"></script>
