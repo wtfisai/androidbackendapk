@@ -1,31 +1,90 @@
 {
-  "name": "android-api-backend",
+  "name": "android-diagnostic-platform",
   "version": "1.0.0",
-  "description": "API backend running on Android device",
-  "main": "src/server.js",
+  "description": "Android device monitoring and management platform",
+  "private": true,
+  "workspaces": [
+    "firebase-backend/functions",
+    "web-dashboard",
+    "shared"
+  ],
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "lint": "eslint . --ext .js",
-    "lint:fix": "eslint . --ext .js --fix",
-    "format": "prettier --write \"**/*.{js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{js,json,md}\"",
-    "test": "npm run lint && npm run format:check"
-  },
-  "dependencies": {
-    "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "multer": "^2.0.2",
-    "nedb": "^1.8.0"
+    "install:all": "npm install && npm run install:firebase && npm run install:android && npm run install:web",
+    "install:firebase": "cd firebase-backend/functions && npm install",
+    "install:android": "cd android-app && ./gradlew build",
+    "install:web": "cd web-dashboard && npm install",
+    
+    "dev": "concurrently \"npm run dev:firebase\" \"npm run dev:web\"",
+    "dev:firebase": "cd firebase-backend && firebase emulators:start",
+    "dev:web": "cd web-dashboard && npm start",
+    "dev:android": "cd android-app && ./gradlew assembleDebug",
+    
+    "build": "npm run build:firebase && npm run build:web && npm run build:android",
+    "build:firebase": "cd firebase-backend/functions && npm run build",
+    "build:web": "cd web-dashboard && npm run build",
+    "build:android": "cd android-app && ./gradlew assembleRelease",
+    
+    "test": "npm run test:firebase && npm run test:web",
+    "test:firebase": "cd firebase-backend/functions && npm test",
+    "test:web": "cd web-dashboard && npm test",
+    "test:android": "cd android-app && ./gradlew test",
+    
+    "lint": "npm run lint:firebase && npm run lint:web",
+    "lint:firebase": "cd firebase-backend/functions && npm run lint",
+    "lint:web": "cd web-dashboard && npm run lint",
+    "lint:android": "cd android-app && ./gradlew lintDebug",
+    
+    "deploy": "npm run deploy:firebase && npm run deploy:web",
+    "deploy:firebase": "cd firebase-backend && firebase deploy",
+    "deploy:web": "cd firebase-backend && firebase deploy --only hosting",
+    
+    "clean": "npm run clean:firebase && npm run clean:web && npm run clean:android",
+    "clean:firebase": "cd firebase-backend/functions && rm -rf lib node_modules",
+    "clean:web": "cd web-dashboard && rm -rf build node_modules",
+    "clean:android": "cd android-app && ./gradlew clean",
+    
+    "legacy:start": "cd legacy && npm start",
+    "legacy:dev": "cd legacy && npm run dev",
+    "legacy:test": "cd legacy && npm test"
   },
   "devDependencies": {
-    "@eslint/js": "^9.34.0",
-    "eslint": "^9.34.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-security": "^3.0.1",
-    "prettier": "^3.6.2"
-  }
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,js,jsx,tsx}": [
+      "eslint --fix",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/android-diagnostic-platform.git"
+  },
+  "keywords": [
+    "android",
+    "diagnostic",
+    "monitoring",
+    "firebase",
+    "mobile",
+    "device-management"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
 }

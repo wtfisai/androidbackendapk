@@ -3,6 +3,7 @@
 # Android Remote Diagnostic API - Installation Script
 # For Termux on Android
 
+
 echo "╔════════════════════════════════════════════════════════════╗"
 echo "║     Android Remote Diagnostic API - Installation Script    ║"
 echo "╚════════════════════════════════════════════════════════════╝"

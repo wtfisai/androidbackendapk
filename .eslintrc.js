@@ -1,7 +1,8 @@
 module.exports = {
+  root: true,
   env: {
     node: true,
-    es2021: true,
+    es2022: true,
     jest: true
   },
   extends: [
@@ -11,7 +12,7 @@ module.exports = {
     'prettier'
   ],
   parserOptions: {
-    ecmaVersion: 2021,
+    ecmaVersion: 2022,
     sourceType: 'module'
   },
   rules: {
@@ -35,11 +36,19 @@ module.exports = {
     indent: ['error', 2, { SwitchCase: 1 }],
     quotes: ['error', 'single', { avoidEscape: true }],
     semi: ['error', 'always'],
-    'comma-dangle': ['error', 'never'],
+    'comma-dangle': ['error', 'always-multiline'],
     'no-multiple-empty-lines': ['error', { max: 1 }],
     'no-trailing-spaces': 'error',
     'arrow-spacing': 'error',
     'space-before-blocks': 'error',
     'keyword-spacing': 'error'
-  }
+  },
+  ignorePatterns: [
+    'node_modules/**',
+    'lib/**',
+    'build/**',
+    'dist/**',
+    'legacy/**',
+    '*.min.js'
+  ]
 };

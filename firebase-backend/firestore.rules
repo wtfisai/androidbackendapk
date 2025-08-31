@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isDeviceOwner(deviceId) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/devices/$(deviceId)) &&
+        get(/databases/$(database)/documents/devices/$(deviceId)).data.userId == request.auth.uid;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Devices collection
+    match /devices/{deviceId} {
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Device metrics collection
+    match /device_metrics/{metricId} {
+      allow read, write: if isDeviceOwner(resource.data.deviceId);
+      allow create: if isAuthenticated() && isDeviceOwner(request.resource.data.deviceId);
+    }
+    
+    // Commands collection
+    match /commands/{commandId} {
+      allow read, write: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isDeviceOwner(resource.data.deviceId)
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.userId == request.auth.uid ||
+        isDeviceOwner(request.resource.data.deviceId)
+      );
+    }
+    
+    // Activities collection
+    match /activities/{activityId} {
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Alerts collection
+    match /alerts/{alertId} {
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+    
+    // Subscriptions collection (read-only for users, write-only for backend)
+    match /subscriptions/{subscriptionId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only backend can write
+    }
+    
+    // Debug sessions collection
+    match /debug_sessions/{sessionId} {
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+    }
+  }
+}

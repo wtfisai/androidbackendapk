@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // User profile images
+    match /users/{userId}/profile/{filename} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Device screenshots and reports
+    match /devices/{deviceId}/{type}/{filename} {
+      allow read, write: if request.auth != null && 
+        exists(/databases/(default)/documents/devices/$(deviceId)) &&
+        get(/databases/(default)/documents/devices/$(deviceId)).data.userId == request.auth.uid;
+    }
+    
+    // Debug session files
+    match /debug_sessions/{sessionId}/{filename} {
+      allow read, write: if request.auth != null &&
+        exists(/databases/(default)/documents/debug_sessions/$(sessionId)) &&
+        get(/databases/(default)/documents/debug_sessions/$(sessionId)).data.userId == request.auth.uid;
+    }
+    
+    // Export files (temporary)
+    match /exports/{userId}/{filename} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
