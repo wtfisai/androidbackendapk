@@ -1,0 +1,5 @@
+lib/**/*
+node_modules/**/*
+src/test/**/*
+*.test.js
+*.spec.js

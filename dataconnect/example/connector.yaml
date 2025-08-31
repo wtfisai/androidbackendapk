@@ -1,0 +1,21 @@
+connectorId: example
+generate:
+  javascriptSdk:
+    - outputDir: ..\..\src\dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ..\..
+      react: false
+      angular: false
+    - outputDir: ..\..\firebase-backend\src\dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ..\..\firebase-backend
+      react: false
+      angular: false
+    - outputDir: ..\..\firebase-backend\functions\src\dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ..\..\firebase-backend\functions
+      react: false
+      angular: false
+  kotlinSdk:
+    - outputDir: ..\..\android-app\app\src\main\kotlin
+      package: com.google.firebase.dataconnect.generated

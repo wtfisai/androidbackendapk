@@ -1,0 +1,27 @@
+mutation InsertDevice @auth(level: USER) {
+  device_insert(data: { isOnline: true, name: "New Device" })
+}
+
+query GetOnlineDevices @auth(level: USER) {
+  devices(where: { isOnline: { eq: true } }) {
+    id
+    name
+    lastCheckIn
+  }
+}
+
+mutation LogCommandOutcome($commandId: UUID!, $deviceId: UUID!, $outcome: String!) @auth(level: USER) {
+  commandLog_insert(data: { commandId: $commandId, deviceId: $deviceId, outcome: $outcome, sentAt_expr: "request.time" })
+}
+
+query GetCommandLogsForDevice($deviceId: UUID!) @auth(level: USER) {
+  commandLogs(where: { deviceId: { eq: $deviceId } }) {
+    id
+    command {
+      name
+      payload
+    }
+    outcome
+    sentAt
+  }
+}

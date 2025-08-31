@@ -1,0 +1,18 @@
+type Device @table {
+  name: String!
+  isOnline: Boolean!
+  lastIpAddress: String
+  lastCheckIn: Timestamp
+}
+
+type Command @table {
+  name: String!
+  payload: String!
+}
+
+type CommandLog @table {
+  device: Device!
+  command: Command!
+  sentAt: Timestamp!
+  outcome: String!
+}

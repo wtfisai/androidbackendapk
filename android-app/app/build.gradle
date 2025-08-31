@@ -11,12 +11,16 @@ android {
 
     defaultConfig {
         applicationId "com.androiddiagnostic.agent"
-        minSdk 24
+        minSdk 30
         targetSdk 34
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        buildConfigField "boolean", "ENABLE_SCOPED_STORAGE", "true"
+        buildConfigField "boolean", "ENABLE_PACKAGE_VISIBILITY", "true"
+        buildConfigField "boolean", "ENABLE_FOREGROUND_SERVICE_TYPES", "true"
     }
 
     buildTypes {

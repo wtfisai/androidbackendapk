@@ -1,0 +1,46 @@
+name: Firebase Deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'firebase-backend/**'
+      - '.github/workflows/firebase-deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: firebase-backend/functions/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd firebase-backend/functions
+        npm ci
+    
+    - name: Run tests
+      run: |
+        cd firebase-backend/functions
+        npm test --passWithNoTests
+    
+    - name: Build functions
+      run: |
+        cd firebase-backend/functions
+        npm run build --if-present
+    
+    - name: Deploy to Firebase
+      uses: w9jds/firebase-action@master
+      with:
+        args: deploy --only functions,firestore:rules,storage:rules
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        PROJECT_PATH: ./firebase-backend
